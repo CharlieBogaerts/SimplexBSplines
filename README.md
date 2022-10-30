@@ -1,7 +1,7 @@
 # Simplex B Splines
 
 ## General info
-This project contains scripts that allow for estimating a simplex B-splines model from data. The theory is taken from the lecture slides of the course AE4320 System Identification of Aerospace Vehicles as part of the Master Control and Simulation on faculty of Aerospace Engineering of Delft University of Technology.
+This project contains scripts that allow for estimating a simplex B-splines model from data. The theory is taken from the lecture slides of the course AE4320 System Identification of Aerospace Vehicles as part of the Master Control and Simulation on the faculty of Aerospace Engineering of Delft University of Technology.
 
 Note: Not verified to work for simplex splines with more than 3 dimensions
 	
