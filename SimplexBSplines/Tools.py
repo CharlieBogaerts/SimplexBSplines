@@ -55,7 +55,7 @@ def toBarrys(vertices_c, point_mat):
     vertices_b = np.hstack([b_zero.reshape(-1, 1), b_main])
     return vertices_b
 
-def constrainedLQS(A, b, H):
+def ECLQS(A, b, H):
     """
     Solve an equality constrained least squares problem, solve
     A @ params = Y subject to H @ params = 0 This is based on Lagrangian

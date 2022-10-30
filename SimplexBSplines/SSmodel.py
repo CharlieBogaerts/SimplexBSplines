@@ -2,9 +2,9 @@ import numpy as np
 import scipy as sp
 import os
 import pickle as p
-from SimplexBSplines import Triangulation as tri
-from SimplexBSplines import MultiIndexSet as mis
-from SimplexBSplines import Tools as t
+import SimplexBSplines.Triangulation as tri
+import SimplexBSplines.MultiIndexSet as mis
+import SimplexBSplines.Tools as t
 
 
 class SSmodel:
@@ -124,7 +124,7 @@ def modelFromData(X, Y, points, poly_order, continuity):
     Tri = tri.Triangulation(points)
     B_matrix, Y_vec = makeRegressionMats(Tri, MIS, X, Y)
     H = makeContinuityMat(Tri, MIS, continuity)
-    params = t.constrainedLQS(B_matrix, Y_vec, H)
+    params = t.ECLQS(B_matrix, Y_vec, H)
     return SSmodel(Tri, params, poly_order)
 
 def makeRegressionMats(Tri, MIS, X, Y):
@@ -152,7 +152,7 @@ def makeRegressionMats(Tri, MIS, X, Y):
 def makeContinuityMat(Tri, MISmain, continuity):
     '''
     (internal function) Built the continuity matrix, indicated with H the lecture
-        slides.
+    slides.
 
     :param Tri: A Triangulation object as is specified in the class
             'Triangulation'
@@ -176,12 +176,21 @@ def makeContinuityMat(Tri, MISmain, continuity):
                 oop_vert_nr_dupli[insert] = entry_nr
                 insert +=1
 
-    diff = pairs_dupli - np.sort(pairs_dupli, axis = 1)
-    include = (diff==0)[:,0]
-    pairs = pairs_dupli[include]                                # pairs of simplex indices that form a border (t1, t2)
-    oop_vertices_t2 = oop_vertices_dupli[np.invert(include)]    # oop (out of plane) vertex index (i in v_i) for 2st simplex in 'pairs'
-    oop_vert_nr_t1 = oop_vert_nr_dupli[include]                 # the position the vertex has in 1st simplex in 'pairs' (for 2d, 0, 1 or 2)
-    oop_vert_nr_t2 = oop_vert_nr_dupli[np.invert(include)]      # the position the vertex has in 2st simplex in 'pairs' (for 2d, 0, 1 or 2)
+    indices_inv = np.empty(nr_borders, dtype = int)
+    indices_inv[:] = -1
+    indices_norm = np.zeros(nr_borders, dtype = int)
+    j=0
+    for i in range(nr_borders*2):
+        if not np.any(indices_inv == i):
+            bool_list = np.all(pairs_dupli == pairs_dupli[i,::-1], axis=1)
+            indices_inv[j] = np.flatnonzero(bool_list)[0]
+            indices_norm[j] = i
+            j += 1
+
+    pairs = pairs_dupli[indices_norm]                   # pairs of simplex indices that form a border (t1, t2)
+    oop_vertices_t2 = oop_vertices_dupli[indices_inv]   # oop (out of plane) vertex index (i in v_i) for 2st simplex in 'pairs'
+    oop_vert_nr_t1 = oop_vert_nr_dupli[indices_norm]    # the position the vertex has in 1st simplex in 'pairs' (for 2d, 0, 1 or 2)
+    oop_vert_nr_t2 = oop_vert_nr_dupli[indices_inv]
 
     order = MISmain.getOrder()
     dimension = M-1
