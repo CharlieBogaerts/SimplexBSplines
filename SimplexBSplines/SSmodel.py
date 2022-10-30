@@ -59,7 +59,9 @@ class SSmodel:
             different entries of each vertex.
         :returns: (1D numpy array) calculated dependent variable values.
         """
-        nr_vertices, N = vertices_c.shape
+        nr_vertices, dim = vertices_c.shape
+        if dim != self.Tri.points.shape[1]:
+            raise ValueError('Mismatch between given vertices and triangulation dimension.')
         vertex_buckets, labels = self.Tri.classify(vertices_c)
         Y_simplex_list = [0]*self.Tri.simplices.shape[0]
         for i in range(self.Tri.simplices.shape[0]):

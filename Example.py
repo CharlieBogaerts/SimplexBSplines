@@ -13,7 +13,7 @@ x2 = np.linspace(-x2_range/2, x2_range/2, tri_size)
 x1_mesh, x2_mesh = np.meshgrid(x1, x2)
 x1_flat = x1_mesh.flatten()
 x2_flat = x2_mesh.flatten()
-points = np.vstack([x1_flat, x2_flat]).T
+points = np.vstack([x1_flat, x2_flat]).T    #points in 2d space used for triangulation
 
 # Making data
 data_res = 50
@@ -36,16 +36,16 @@ X2_flat_model = X2_mesh_model.flatten()
 X_model = np.vstack([X1_flat_model, X2_flat_model]).T
 
 # Make model
-r = 1
-poly_order = 6
-Model = ss.modelFromData(X_fit, Y_fit, points, poly_order, r)
+r = 1               # order of continuity. 0 -> same f(x), 1 -> same f'(x), etc
+poly_order = 6      # order of the simplex polynomials
+Model = ss.modelFromData(X_fit, Y_fit, points, poly_order, r)   #Estimate the model from data
 
 # Save and load model
-Model.save('Models/model3')
-NewModel = ss.modelFromCsv('Models/model3')
+Model.save('Models/model1')                 # save the model in folder 'Models'
+NewModel = ss.modelFromCsv('Models/model1') # load 'model1' from the folder 'Models'
 
 # Evaluate model for plotting
-Y_est = NewModel.eval(X_model)
+Y_est = NewModel.eval(X_model)          # calculate the estimated Y values according to the model
 
 # Plot triangulation grid
 plt.figure()
