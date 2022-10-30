@@ -7,7 +7,7 @@ from SimplexBSplines import SSmodel as ss
 # Making triangulation grid
 x1_range = 2
 x2_range = 2
-tri_size = 5
+tri_size = 4
 x1 = np.linspace(-x1_range/2, x1_range/2, tri_size)
 x2 = np.linspace(-x2_range/2, x2_range/2, tri_size)
 x1_mesh, x2_mesh = np.meshgrid(x1, x2)

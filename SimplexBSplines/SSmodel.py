@@ -113,6 +113,9 @@ def modelFromData(X, Y, points, poly_order, continuity):
         lecture slides)
     :param continuity: (int >=0) Order of continuity ('r' in the slides).
     '''
+    X, Y, nan_rows_found = removeNans(X, Y)
+    if nan_rows_found:
+        print('Warning: data points containing nan values have been removed!')
     nr_vertices, dimension = X.shape
     nr_vertices2 = Y.shape[0]
     nr_points, dimension2 = points.shape
@@ -126,6 +129,17 @@ def modelFromData(X, Y, points, poly_order, continuity):
     H = makeContinuityMat(Tri, MIS, continuity)
     params = t.ECLQS(B_matrix, Y_vec, H)
     return SSmodel(Tri, params, poly_order)
+
+def removeNans(X, Y):
+    """
+    Remove data points that have have a nan value in either the X or Y arrays.
+    """
+    nan_rows_X = np.any(np.isnan(X), axis=1)
+    nan_rows_Y = np.isnan(Y)
+    nan_rows = np.any(np.vstack([nan_rows_X, nan_rows_Y]), axis = 0)
+    no_nan_rows = np.invert(nan_rows)
+    nan_rows_found = np.any(nan_rows)
+    return X[no_nan_rows], Y[no_nan_rows], nan_rows_found
 
 def makeRegressionMats(Tri, MIS, X, Y):
     '''
@@ -147,7 +161,7 @@ def makeRegressionMats(Tri, MIS, X, Y):
         B_sub_matrices[i] = makeBMatrix(X_b, MIS)
     B_matrix = sp.linalg.block_diag(*B_sub_matrices)
     Y_vec = Y[np.concatenate(labels)]
-    return B_matrix, Y_vec
+    return B_matrix, Y_vec    
 
 def makeContinuityMat(Tri, MISmain, continuity):
     '''
