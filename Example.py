@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
-from SimplexBSplines import SSmodel as ss
+from SimplexBSplines import Modeling as ss
 
 
 # Making triangulation grid
