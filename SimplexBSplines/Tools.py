@@ -74,3 +74,36 @@ def ECLQS(A, b, H):
     M2 = np.concatenate([A.T@b, np.zeros(n_H)])
     params_aug = np.linalg.pinv(M1) @ M2
     return params_aug[:m_A]
+
+
+def Random_PartitionData(Data, TrainingRatio, *argv):
+    '''Function to partition data through random sampling without replacement
+
+    :param Data: Data to be partitioned
+    :param TrainingRatio: Ratio of data, as float ]0, 1[, to be allocated to the training data subset
+    :param argv: Additional positional arguments, unused.
+    
+    :return: Tuple of lists as ([Partitioned training Data, Indices training], [Partitioned testing data, Indices testing])
+
+    This function is taken from the 'droneidentification' prject authored by Jasper van Beers
+    '''
+    N = Data.shape[0]
+    if TrainingRatio >= 1:
+        print('[ WARNING ] Inputted training ratio is >= 1 when it should be < 1. Defaulting to 0.7')
+        TrainingRatio = 0.7
+    N_Training = int(TrainingRatio*N)
+
+    indices = np.arange(N)
+    indices_bool = np.ones((N, 1))
+    indices_training = np.sort(np.random.choice(indices, N_Training, replace = False))
+    indices_bool[indices_training] = 0
+    indices_test = np.where(indices_bool)[0]
+
+    try:
+        TrainingData = Data[:, indices_training]
+        TestData = Data[:, indices_test]
+    except (IndexError, MemoryError) as e:
+        TrainingData  = Data[indices_training, :]
+        TestData = Data[indices_test, :]
+
+    return [TrainingData, indices_training], [TestData, indices_test]
