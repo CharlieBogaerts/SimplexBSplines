@@ -173,35 +173,72 @@ def makeBMatrix(vertices_b, MultiIndexSet):
     return B_matrix
 
 
-def _RMSE_model(X,Y,model):
+def _RMSE_model(X,Y_true,model):
 
     ''' 
     Calculate the RMSE of a spline model given the training data of independent variables, the model object, and true observations observations
     
-    :param X: Numpy array containing each training independent variable in its own column
-    :param Y: Numpy array containing the modelled observation data
-    :param model: B-Spline modelling object
+    :param X: numpy array with shape [N x m] containing each of the (m) 
+        independent training variables in their own column
+    :param Y_true: Targets (Measurements), array with shape [N x 1]
+    :param model: B-Spline model object
     
-    :returns RMSE: Calculated root mean squared error of model residuals'''
+    :returns RMSE: Calculated root measn squared error of model residuals'''
 
     Y_model = model.eval(X)
 
-    N = len(Y)
-    RMSE = np.sqrt(np.sum((Y - Y_model.reshape(Y.shape))**2)/N)
+    N = len(Y_true)
+    RMSE = np.sqrt(np.sum((Y_true - Y_model.reshape(Y_true.shape))**2)/N)
 
     return RMSE
 
-def _RMSE(Y_train, Y_model):
+def _RMSE(Y_true, Y_model):
 
     ''' Calculate RMSE from true observations and model predictions
     
-    :param Y_train: True observation data
-    :param Y_model: Model predictions
+    :param Y_true: Targets (Measurements), array with shape [N x 1]
+    :param Y_model: Model predictions, array with shape [N x 1]
     
     :returns RMSE: Root mean square error'''
 
-    N = len(Y_train)
+    N = len(Y_true)
 
-    RMSE = np.sqrt(np.sum((Y_train - Y_model.reshape(Y_train.shape))**2)/N)
+    RMSE = np.sqrt(np.sum((Y_true - Y_model.reshape(Y_true.shape))**2)/N)
 
     return RMSE
+
+
+def _CoeffOfDetermination_R2_model(X, Y_true, model):
+    '''(Internal) Function to calculate the coefficient of determination (R squared) from true observations, independent modelling variables, and 
+       a spline model.
+
+    :param X: numpy array with shape [N x m] containing each of the (m) independent training variables in their own column
+    :param Y_true: Targets (Measurements), array with shape [N x 1]
+    :param model: B-Spline model object
+
+    :return: Coefficient of Determination
+
+    This function is taken from the 'droneidentification' prject authored by Jasper van Beers
+    '''
+
+    Y_model = model.eval(X)
+
+    N = np.max(Y_true.shape)
+    SSr = Y_model.T*Y_true - N*np.nanmean(Y_true)**2
+    SSt = Y_true.T*Y_true - N*np.nanmean(Y_true)**2
+    return SSr/SSt
+
+
+def _CoeffOfDetermination_R2(Y_true, Y_model):
+    '''(Internal) Function to calculate the coefficient of determination (R squared)
+
+    :param Y_true: Targets (Measurements), array with shape [N x 1]
+    :param Y_model: Model predictions, array with shape [N x 1] where N = number observations
+    :return: Coefficient of Determination
+
+    This function is taken from the 'droneidentification' prject authored by Jasper van Beers
+    '''
+    N = np.max(Y_true.shape)
+    SSr = Y_model.T*Y_true - N*np.nanmean(Y_true)**2
+    SSt = Y_true.T*Y_true - N*np.nanmean(Y_true)**2
+    return SSr/SSt
