@@ -1,8 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
-from SimplexBSplines import Modeling as ss
-from SimplexBSplines.Tools import Random_PartitionData
+import Modeling as ss
+from Tools import Random_PartitionData
 
 
 # Making triangulation grid
@@ -80,8 +80,8 @@ fig = plt.figure(figsize=(13,6))
 ax1 = plt.subplot(121, projection='3d')
 ax1.scatter(X_fit_train[:,0],X_fit_train[:,1],Y_fit_train,alpha = 0.4, marker = 'x', label = 'Training data')
 ax1.scatter(X_fit_test[:,0],X_fit_test[:,1],Y_fit_test,   alpha = 0.4, label = 'Test data')
-ax1.triplot(Model.Tri.points[:,0], Model.Tri.points[:,1], Model.Tri.simplices, zs = zmin,label = 'Simplex edges')
-ax1.plot(Model.Tri.points[:,0], Model.Tri.points[:,1], 'o', zs = zmin, label = 'Simplex vertices')
+ax1.triplot(Model.Tri.points[:,0], Model.Tri.points[:,1], Model.Tri.simplices, color = 'm', zs = zmin,label = 'Simplex edges')
+ax1.plot(Model.Tri.points[:,0], Model.Tri.points[:,1], 'o', color = 'g', zs = zmin, label = 'Simplex vertices')
 plt.legend()
 plt.title('Data used for fitting')
 
