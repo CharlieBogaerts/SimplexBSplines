@@ -213,7 +213,7 @@ def _CoeffOfDetermination_R2_model(X, Y_true, model):
        a spline model.
 
     :param X: numpy array with shape [N x m] containing each of the (m) independent training variables in their own column
-    :param Y_true: Targets (Measurements), array with shape [N x 1]
+    :param Y_true: Targets (Measurements), array with shape [N] (1D)
     :param model: B-Spline model object
 
     :return: Coefficient of Determination
@@ -224,21 +224,22 @@ def _CoeffOfDetermination_R2_model(X, Y_true, model):
     Y_model = model.eval(X)
 
     N = np.max(Y_true.shape)
-    SSr = Y_model.T*Y_true - N*np.nanmean(Y_true)**2
-    SSt = Y_true.T*Y_true - N*np.nanmean(Y_true)**2
+
+    SSr = np.dot(Y_model, Y_true) - N*np.nanmean(Y_true)**2
+    SSt = np.dot(Y_true, Y_true) - N*np.nanmean(Y_true)**2
     return SSr/SSt
 
 
 def _CoeffOfDetermination_R2(Y_true, Y_model):
     '''(Internal) Function to calculate the coefficient of determination (R squared)
 
-    :param Y_true: Targets (Measurements), array with shape [N x 1]
-    :param Y_model: Model predictions, array with shape [N x 1] where N = number observations
+    :param Y_true: Targets (Measurements), array with shape [N] (1D)
+    :param Y_model: Model predictions, array with shape [N] (1D) where N = number observations
     :return: Coefficient of Determination
 
     This function is taken from the 'droneidentification' prject authored by Jasper van Beers
     '''
     N = np.max(Y_true.shape)
-    SSr = Y_model.T*Y_true - N*np.nanmean(Y_true)**2
-    SSt = Y_true.T*Y_true - N*np.nanmean(Y_true)**2
+    SSr = np.dot(Y_model, Y_true)- N*np.nanmean(Y_true)**2
+    SSt = np.dot(Y_true, Y_true) - N*np.nanmean(Y_true)**2
     return SSr/SSt
