@@ -1,10 +1,10 @@
 import numpy as np
 import scipy as sp
 import pickle as p
-import SimplexBSplines.Triangulation as tri
-import SimplexBSplines.MultiIndexSet as mis
-import SimplexBSplines.Tools as t
-import SimplexBSplines.SSmodel as ssm
+import Triangulation as tri
+import MultiIndexSet as mis
+import Tools as t
+import SSmodel as ssm
 
 
 def modelFromCsv(path):

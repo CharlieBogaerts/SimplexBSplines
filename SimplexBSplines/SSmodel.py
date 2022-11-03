@@ -2,10 +2,10 @@ import numpy as np
 import scipy as sp
 import os
 import pickle as p
-import SimplexBSplines.Triangulation as tri
-import SimplexBSplines.MultiIndexSet as mis
-import SimplexBSplines.Tools as t
-import SimplexBSplines.Modeling as mod
+import Triangulation as tri
+import MultiIndexSet as mis
+import Tools as t
+import Modeling as mod
 
 
 class SSmodel:
