@@ -171,3 +171,37 @@ def makeBMatrix(vertices_b, MultiIndexSet):
     for k in range(MultiIndexSet.length):
         B_matrix[:,k] = t.evalBasisFunc(vertices_b, MultiIndexSet.matrix[k])
     return B_matrix
+
+
+def _RMSE_model(X,Y,model):
+
+    ''' 
+    Calculate the RMSE of a spline model given the training data of independent variables, the model object, and true observations observations
+    
+    :param X: Numpy array containing each training independent variable in its own column
+    :param Y: Numpy array containing the modelled observation data
+    :param model: B-Spline modelling object
+    
+    :returns RMSE: Calculated root mean squared error of model residuals'''
+
+    Y_model = model.eval(X)
+
+    N = len(Y)
+    RMSE = np.sqrt(np.sum((Y - Y_model.reshape(Y.shape))**2)/N)
+
+    return RMSE
+
+def _RMSE(Y_train, Y_model):
+
+    ''' Calculate RMSE from true observations and model predictions
+    
+    :param Y_train: True observation data
+    :param Y_model: Model predictions
+    
+    :returns RMSE: Root mean square error'''
+
+    N = len(Y_train)
+
+    RMSE = np.sqrt(np.sum((Y_train - Y_model.reshape(Y_train.shape))**2)/N)
+
+    return RMSE
