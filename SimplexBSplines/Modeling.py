@@ -19,6 +19,23 @@ def modelFromCsv(path):
     poly_order = int(np.loadtxt(path+ '/misc.csv', delimiter=','))
     return ssm.SSmodel(Tri, params, poly_order)
 
+def modelFromPickle(path):
+
+    '''
+    Load simplex spline model from one pickle file which contains all relevant model information
+    
+    :param path: path to model.pkl file
+    
+    '''
+    modelIn = p.load(open(path+'/model.pkl', 'rb'))
+
+    Tri = modelIn['Triangulate']
+    params = modelIn['params']
+    poly_order = modelIn['misc']
+
+    return ssm.SSmodel(Tri, params, poly_order)
+
+
 def modelFromData(X, Y, points, poly_order, continuity):
     '''
     Estimate a simplex spline model based data, preferred order of the simplex
