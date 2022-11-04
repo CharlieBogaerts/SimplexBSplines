@@ -33,7 +33,12 @@ def modelFromPickle(path):
     params = modelIn['params']
     poly_order = modelIn['misc']
 
-    return ssm.SSmodel(Tri, params, poly_order)
+    try:
+        training_data = modelIn['training data']
+        return ssm.SSmodel(Tri, params, poly_order), training_data
+    except:
+        print (f'[ INFO ] Model save pickle does not contain training data')
+        return ssm.SSmodel(Tri, params, poly_order)
 
 
 def modelFromData(X, Y, points, poly_order, continuity):
@@ -205,7 +210,7 @@ def _RMSE_model(X,Y_true,model):
     Y_model = model.eval(X)
 
     N = len(Y_true)
-    RMSE = np.sqrt(np.sum((Y_true - Y_model.reshape(Y_true.shape))**2)/N)
+    RMSE = np.sqrt(np.nansum((Y_true - Y_model.reshape(Y_true.shape))**2)/N)
 
     return RMSE
 
@@ -220,7 +225,7 @@ def _RMSE(Y_true, Y_model):
 
     N = len(Y_true)
 
-    RMSE = np.sqrt(np.sum((Y_true - Y_model.reshape(Y_true.shape))**2)/N)
+    RMSE = np.sqrt(np.nansum((Y_true - Y_model.reshape(Y_true.shape))**2)/N)
 
     return RMSE
 
@@ -242,8 +247,8 @@ def _CoeffOfDetermination_R2_model(X, Y_true, model):
 
     N = np.max(Y_true.shape)
 
-    SSr = np.dot(Y_model, Y_true) - N*np.nanmean(Y_true)**2
-    SSt = np.dot(Y_true, Y_true) - N*np.nanmean(Y_true)**2
+    SSr = np.nansum(Y_model*Y_true) - N*np.nanmean(Y_true)**2
+    SSt = np.nansum(Y_true*Y_true) - N*np.nanmean(Y_true)**2
     return SSr/SSt
 
 
@@ -257,6 +262,6 @@ def _CoeffOfDetermination_R2(Y_true, Y_model):
     This function is taken from the 'droneidentification' prject authored by Jasper van Beers
     '''
     N = np.max(Y_true.shape)
-    SSr = np.dot(Y_model, Y_true)- N*np.nanmean(Y_true)**2
-    SSt = np.dot(Y_true, Y_true) - N*np.nanmean(Y_true)**2
+    SSr = np.nansum(Y_model*Y_true)- N*np.nanmean(Y_true)**2
+    SSt = np.nansum(Y_true*Y_true) - N*np.nanmean(Y_true)**2
     return SSr/SSt
