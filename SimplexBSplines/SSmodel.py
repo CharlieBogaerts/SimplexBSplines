@@ -77,15 +77,28 @@ class SSmodel:
         Y[labels_lumped] = Y_unordered
         return Y
 
-    def save(self, path):
+    def save(self, path, pickleWholeModel = False, trainingData = None):
         """
         Save current simplex spline model in a set of files.
 
         :param path: Model path and name. E.g. 'models/thrust_model'
+        :param pickleWholeModelObject: Bool to specifiy whether to save the whole model (including triangulation, params, misc) into one file
+        :param trainingData: Data used for model training as Pandas dataframe (or any other consistent data structure), only save if not None.
         """
         exists = os.path.exists(path)
         if not exists:
             os.makedirs(path)
+
+        if pickleWholeModel:
+            modelOut = {'Triangulate':self.Tri,
+                        'params':self.params,
+                        'misc':np.array([self.poly_order])}
+
+            if trainingData is not None:
+                modelOut['training data'] = trainingData
+
+            p.dump(modelOut, open(path + '/model.pkl', 'wb'))
+            
         p.dump(self.Tri , open(path + '/Triangulate.p', 'wb'))
         np.savetxt(path + '/params.csv', self.params, delimiter=",")
         np.savetxt(path + '/misc.csv', np.array([self.poly_order]), delimiter=",")
