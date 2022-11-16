@@ -41,7 +41,7 @@ def modelFromPickle(path):
         return ssm.SSmodel(Tri, params, poly_order)
 
 
-def modelFromData(X, Y, points, poly_order, continuity):
+def modelFromData(X, Y, points, poly_order, continuity, Regularize = False, lambda_reg = 0.0):
     '''
     Estimate a simplex spline model based data, preferred order of the simplex
     polynomials  and the continuity order ('r' in the slides).
@@ -54,6 +54,8 @@ def modelFromData(X, Y, points, poly_order, continuity):
     :param poly_order: (int >=1) Order of the simplex polynomials ('d' in the
         lecture slides)
     :param continuity: (int >=0) Order of continuity ('r' in the slides).
+    :param Regularize: Bool to specify whether the model should be regularized
+    :param lambda_reg: Hyper-parameter for regularization
     '''
     X, Y, nan_rows_found = removeNans(X, Y)
     if nan_rows_found:
@@ -67,10 +69,10 @@ def modelFromData(X, Y, points, poly_order, continuity):
         raise ValueError("dimension of 'X' and 'points' do not match.")
     MIS = mis.makeMISet(dimension, poly_order)
     Tri = tri.Triangulation(points)
-    B_matrix, Y_vec = makeRegressionMats(Tri, MIS, X, Y)
+    B_matrix, Y_vec = makeRegressionMats(Tri, MIS, X, Y, Regularize, lambda_reg)
     H = makeContinuityMat(Tri, MIS, continuity)
-    params = t.ECLQS(B_matrix, Y_vec, H)
-    return ssm.SSmodel(Tri, params, poly_order)
+    params, vars = t.ECLQS(B_matrix, Y_vec, H)
+    return ssm.SSmodel(Tri, params, poly_order, vars)
 
 def removeNans(X, Y):
     """
@@ -83,7 +85,7 @@ def removeNans(X, Y):
     nan_rows_found = np.any(nan_rows)
     return X[no_nan_rows], Y[no_nan_rows], nan_rows_found
 
-def makeRegressionMats(Tri, MIS, X, Y):
+def makeRegressionMats(Tri, MIS, X, Y, Regularize = False, lambda_reg = 0.0):
     '''
     (internal function) Built the estimation matrices and vector, indicated with B
     and Y in the lecture slides, repsectively.
@@ -94,6 +96,8 @@ def makeRegressionMats(Tri, MIS, X, Y):
             'MultiIndexSet'
     :param X: Independent data points, see modelFromData()
     :param Y: Dependent data points, see modelFromData()
+    :param Regularize: Bool to specify whether the model should be regularized
+    :param lambda_reg: Hyper-parameter for regularization
     '''
     X_buckets, labels = Tri.classify(X)
     nr_simplices = len(labels)
@@ -102,6 +106,12 @@ def makeRegressionMats(Tri, MIS, X, Y):
         X_b = t.toBarrys(X_buckets[i], Tri.getPointMat(i))
         B_sub_matrices[i] = makeBMatrix(X_b, MIS)
     B_matrix = sp.linalg.block_diag(*B_sub_matrices)
+
+    # use ridge regerssion with hyper parameter 
+    if Regularize:
+        print (f'[ INFO ] Regularizing spline model with {lambda_reg = }.')
+        B_matrix += lambda_reg*np.eye(B_matrix.shape[0])
+
     Y_vec = Y[np.concatenate(labels)]
     return B_matrix, Y_vec    
 
