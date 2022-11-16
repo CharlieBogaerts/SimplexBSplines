@@ -9,7 +9,7 @@ import Modeling as mod
 
 
 class SSmodel:
-    def __init__(self, Tri, params, poly_order):
+    def __init__(self, Tri, params, poly_order, vars):
         """
         Constructs SSmodel object. The model is defined by a triangulation object,
         a set of model parameters (b-coefficients) and the order of the simplex
@@ -35,6 +35,7 @@ class SSmodel:
         self.Tri = Tri
         self.params = params
         self.poly_order = poly_order
+        self.param_vars = vars
 
     def evalSingle(vertex_c):
         """
@@ -92,6 +93,7 @@ class SSmodel:
         if pickleWholeModel:
             modelOut = {'Triangulate':self.Tri,
                         'params':self.params,
+                        'variances':self.param_vars,
                         'misc':np.array([self.poly_order])}
 
             if trainingData is not None:
