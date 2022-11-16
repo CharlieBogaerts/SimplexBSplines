@@ -72,8 +72,15 @@ def ECLQS(A, b, H):
     M1 = np.block([[A.T@A, H.T],
                       [H, np.zeros((n_H, n_H))]])
     M2 = np.concatenate([A.T@b, np.zeros(n_H)])
-    params_aug = np.linalg.pinv(M1) @ M2
-    return params_aug[:m_A]
+
+    M1inv = np.linalg.pinv(M1)
+
+    # B-coefficent variance matrix
+    C1 = M1inv[:m_A,:m_A]
+
+    params_aug = M1inv @ M2
+
+    return params_aug[:m_A], C1
 
 
 def Random_PartitionData(Data, TrainingRatio, *argv):
