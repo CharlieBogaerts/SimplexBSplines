@@ -34,8 +34,9 @@ def modelFromPickle(path):
     poly_order = modelIn['misc']
 
     try:
+        vars = modelIn['variances']
         training_data = modelIn['training data']
-        return ssm.SSmodel(Tri, params, poly_order), training_data
+        return ssm.SSmodel(Tri, params, poly_order, vars), training_data
     except:
         print (f'[ INFO ] Model save pickle does not contain training data')
         return ssm.SSmodel(Tri, params, poly_order)
@@ -69,9 +70,9 @@ def modelFromData(X, Y, points, poly_order, continuity, Regularize = False, lamb
         raise ValueError("dimension of 'X' and 'points' do not match.")
     MIS = mis.makeMISet(dimension, poly_order)
     Tri = tri.Triangulation(points)
-    B_matrix, Y_vec = makeRegressionMats(Tri, MIS, X, Y, Regularize, lambda_reg)
+    B_matrix, Y_vec = makeRegressionMats(Tri, MIS, X, Y)
     H = makeContinuityMat(Tri, MIS, continuity)
-    params, vars = t.ECLQS(B_matrix, Y_vec, H)
+    params, vars = t.ECLQS(B_matrix, Y_vec, H, Regularize, lambda_reg)
     return ssm.SSmodel(Tri, params, poly_order, vars)
 
 def removeNans(X, Y):
@@ -85,7 +86,7 @@ def removeNans(X, Y):
     nan_rows_found = np.any(nan_rows)
     return X[no_nan_rows], Y[no_nan_rows], nan_rows_found
 
-def makeRegressionMats(Tri, MIS, X, Y, Regularize = False, lambda_reg = 0.0):
+def makeRegressionMats(Tri, MIS, X, Y):
     '''
     (internal function) Built the estimation matrices and vector, indicated with B
     and Y in the lecture slides, repsectively.
@@ -106,12 +107,6 @@ def makeRegressionMats(Tri, MIS, X, Y, Regularize = False, lambda_reg = 0.0):
         X_b = t.toBarrys(X_buckets[i], Tri.getPointMat(i))
         B_sub_matrices[i] = makeBMatrix(X_b, MIS)
     B_matrix = sp.linalg.block_diag(*B_sub_matrices)
-
-    # use ridge regerssion with hyper parameter 
-    if Regularize:
-        print (f'[ INFO ] Regularizing spline model with {lambda_reg = }.')
-        B_matrix += lambda_reg*np.eye(B_matrix.shape[0])
-
     Y_vec = Y[np.concatenate(labels)]
     return B_matrix, Y_vec    
 

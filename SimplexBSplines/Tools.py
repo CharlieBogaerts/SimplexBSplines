@@ -55,7 +55,7 @@ def toBarrys(vertices_c, point_mat):
     vertices_b = np.hstack([b_zero.reshape(-1, 1), b_main])
     return vertices_b
 
-def ECLQS(A, b, H):
+def ECLQS(A, b, H, Regularize = False, lambda_reg = 0.0):
     """
     Solve an equality constrained least squares problem, solve
     A @ params = Y subject to H @ params = 0 This is based on Lagrangian
@@ -72,6 +72,11 @@ def ECLQS(A, b, H):
     M1 = np.block([[A.T@A, H.T],
                       [H, np.zeros((n_H, n_H))]])
     M2 = np.concatenate([A.T@b, np.zeros(n_H)])
+
+    # use ridge regerssion with hyper parameter 
+    if Regularize:
+        print (f'[ INFO ] Regularizing spline model with {lambda_reg = }.')
+        M1[:m_A,:m_A] += lambda_reg*np.eye(m_A)
 
     M1inv = np.linalg.pinv(M1)
 
@@ -94,6 +99,9 @@ def Random_PartitionData(Data, TrainingRatio, *argv):
 
     This function is taken from the 'droneidentification' prject authored by Jasper van Beers
     '''
+
+    np.random.seed(111)
+
     N = Data.shape[0]
     if TrainingRatio >= 1:
         print('[ WARNING ] Inputted training ratio is >= 1 when it should be < 1. Defaulting to 0.7')
