@@ -37,7 +37,7 @@ class SSmodel:
         self.poly_order = poly_order
         self.param_vars = vars
 
-    def evalSingle(vertex_c):
+    def evalSingle(self, vertex_c):
         """
         Same function as 'SSmodel.eval', but accepts a single vertex.
 
@@ -46,8 +46,8 @@ class SSmodel:
         """
         if vertex_c.ndim != 1:
             raise ValueError("'vertex_c' should be a 1D numpy array")
-        vertex_c = vertex.reshape(1,-1)
-        Y = self.eval(self, vertex_c)[0]
+        vertex_c = vertex_c.reshape(1,-1)
+        Y = self.eval(vertex_c)[0]
         return Y
 
     def eval(self, vertices_c):
