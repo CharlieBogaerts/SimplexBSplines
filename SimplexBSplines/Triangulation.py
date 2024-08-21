@@ -2,18 +2,18 @@ import numpy as np
 import scipy.spatial as spat
 
 class Triangulation:
-    def __init__(self, points):
+    def __init__(self, grid_points):
         """
         Constructs Triangulation object. This is pretty much an extension
         to the spat.Delaunay(points). 
 
-        :param points: (2D numpy array) Cartesian vertors which should be
+        :param grid_points: (2D numpy array) Cartesian vertors which should be
             used in the triangulation. The 0th axis contains the different
             vectors. The vector dimension should be higher than 2
         :returns: Triangulation model object
         """
-        self.points = points
-        self.Tri = spat.Delaunay(points)
+        self.points = grid_points
+        self.Tri = spat.Delaunay(grid_points)
         nr_simps, M = self.Tri.simplices.shape
         reorder = np.argsort(self.Tri.simplices, axis = 1)
         self.simplices = np.zeros((nr_simps, M), dtype = int)
@@ -28,7 +28,7 @@ class Triangulation:
         are devided into buckets where each bucket corresponds to a simplex
         in Triangulation.simplices.
 
-        :param vertices_c: (2D numpy array) Cartesian vertors which should be
+        :param vertices_c: (2D numpy array) Cartesian vertors which will be
             divided based on the simplex they fall into.
         :returns: (List of 2D numpy arrays) Each list entry corresponds to a
             simplex. 
@@ -43,7 +43,7 @@ class Triangulation:
             vertex_buckets[i] = vertices_c[labels_simplex]
         return vertex_buckets, labels
 
-    def getPointMat(self, simplex_index):
+    def get_point_mat(self, simplex_index):
         """
         Returns a matrix contaning the diffent points that make up a simplex.
 
