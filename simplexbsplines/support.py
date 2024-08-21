@@ -53,7 +53,12 @@ def toBarrys(vertices_c, point_mat):
     if M-1 != dimension2:
         raise ValueError("'point_mat' sized improper to describe a simplex")
     AT = point_mat[1:] - np.tile(point_mat[0], (M-1, 1))
-    b_main =  (vertices_c - np.tile(point_mat[0], (length, 1))) @ sp.linalg.inv(AT)
+    try:
+        ATinv = sp.linalg.inv(AT)
+    except:
+        raise Exception("No valid coordinate transformation to barrycentic. "
+                        + "This is probably due to a degenerate simplex.")
+    b_main =  (vertices_c - np.tile(point_mat[0], (length, 1))) @ ATinv
     b_zero = np.ones(length) - np.sum(b_main, axis = 1)
     vertices_b = np.hstack([b_zero.reshape(-1, 1), b_main])
     return vertices_b
